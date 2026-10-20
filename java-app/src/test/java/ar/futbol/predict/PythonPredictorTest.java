@@ -62,9 +62,9 @@ class PythonPredictorTest {
         Prediction poisson = predictor.predict(Model.POISSON, "Alpha", "Gamma");
 
         assertEquals("Elo", elo.model());
-        assertEquals("4", elo.details().get("Matches used"));
+        assertEquals("4", elo.details().get("Partidos usados"));
         assertEquals("Poisson", poisson.model());
-        assertTrue(poisson.details().containsKey("Expected goals"));
+        assertTrue(poisson.details().containsKey("Goles esperados"));
         for (Prediction prediction : List.of(elo, poisson)) {
             assertEquals(1.0, prediction.homeWin() + prediction.draw() + prediction.awayWin(), 1e-9);
             assertTrue(prediction.homeWin() > prediction.awayWin(), prediction.model() + ": Alpha won every match");
@@ -72,7 +72,7 @@ class PythonPredictorTest {
 
         var error = assertThrows(PredictionException.class,
                 () -> predictor.predict(Model.ELO, "Alpha", "Nobody"));
-        assertEquals("unknown team: Nobody", error.getMessage());
+        assertEquals("equipo desconocido: Nobody", error.getMessage());
     }
 
     private static Match match(String date, String home, String away, int homeGoals, int awayGoals) {

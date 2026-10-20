@@ -74,14 +74,14 @@ class CsvMatchReaderTest {
 
         assertEquals(2, result.matches().size());
         assertEquals(List.of(
-                "line 3: date '10/02/2024' is not a valid yyyy-MM-dd date",
-                "line 4: home_goals 'two' is not a whole number",
-                "line 5: goals cannot be negative",
-                "line 6: a team cannot play itself (Alpha)",
-                "line 7: expected 7 fields but found 6",
-                "line 8: home_team is empty",
-                "line 9: competition is empty",
-                "line 10: duplicate match Alpha vs Beta on 2024-02-10"),
+                "línea 3: la fecha '10/02/2024' no tiene el formato yyyy-MM-dd",
+                "línea 4: home_goals 'two' no es un número entero",
+                "línea 5: los goles no pueden ser negativos",
+                "línea 6: un equipo no puede jugar contra sí mismo (Alpha)",
+                "línea 7: se esperaban 7 campos pero hay 6",
+                "línea 8: home_team está vacío",
+                "línea 9: competition está vacío",
+                "línea 10: partido repetido: Alpha vs Beta el 2024-02-10"),
                 result.errors());
     }
 
@@ -89,7 +89,7 @@ class CsvMatchReaderTest {
     void missingRequiredColumnIsFatal() {
         var e = assertThrows(IOException.class,
                 () -> parse("season,date,home_team,away_team,home_goals\n"));
-        assertEquals("the CSV header is missing column(s): competition, away_goals", e.getMessage());
+        assertEquals("al encabezado del CSV le faltan columnas: competition, away_goals", e.getMessage());
     }
 
     @Test

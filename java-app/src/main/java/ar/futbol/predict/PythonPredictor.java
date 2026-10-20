@@ -37,17 +37,17 @@ public final class PythonPredictor implements Predictor {
         try {
             prediction = PythonRunner.GSON.fromJson(json, Prediction.class);
         } catch (JsonParseException e) {
-            throw new PredictionException("could not read Python's answer: " + e.getMessage());
+            throw new PredictionException("no se pudo leer la respuesta de Python: " + e.getMessage());
         }
         if (prediction == null || prediction.model() == null
                 || prediction.homeTeam() == null || prediction.awayTeam() == null) {
-            throw new PredictionException("Python's answer is missing fields: " + json.strip());
+            throw new PredictionException("a la respuesta de Python le faltan datos: " + json.strip());
         }
 
         double[] chances = {prediction.homeWin(), prediction.draw(), prediction.awayWin()};
         boolean eachValid = DoubleStream.of(chances).allMatch(p -> p >= 0 && p <= 1);
         if (!eachValid || Math.abs(DoubleStream.of(chances).sum() - 1) > TOLERANCE) {
-            throw new PredictionException("Python's probabilities do not add up to 1: " + json.strip());
+            throw new PredictionException("las probabilidades de Python no suman 1: " + json.strip());
         }
         return prediction;
     }

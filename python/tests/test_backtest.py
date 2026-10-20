@@ -68,8 +68,8 @@ def test_baseline_uses_the_outcome_rates_seen_so_far():
 
 
 @pytest.mark.parametrize("start, message", [
-    ("2030-01-01", "no matches on or after 2030-01-01 to evaluate"),
-    ("2000-01-01", "no matches before 2000-01-01 to warm the models up"),
+    ("2030-01-01", "no hay partidos desde el 2030-01-01 para evaluar"),
+    ("2000-01-01", "no hay partidos antes del 2000-01-01 para calentar los modelos"),
 ])
 def test_needs_matches_on_both_sides_of_the_start_date(start, message):
     with pytest.raises(ValueError, match=message):
@@ -97,4 +97,4 @@ def test_main_reports_errors_on_stderr(make_db, capsys):
     exit_code = main(["--db", str(make_db(ROWS)), "--from", "2030-01-01"])
 
     assert exit_code == 1
-    assert "no matches on or after 2030-01-01" in capsys.readouterr().err
+    assert "no hay partidos desde el 2030-01-01" in capsys.readouterr().err

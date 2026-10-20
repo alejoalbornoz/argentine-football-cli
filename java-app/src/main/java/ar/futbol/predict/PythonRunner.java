@@ -57,7 +57,7 @@ public final class PythonRunner {
     /** Runs {@code script} with {@code arguments} and returns what it printed on stdout. */
     String run(Path script, Duration timeout, String... arguments) throws PredictionException {
         if (!Files.isRegularFile(script)) {
-            throw new PredictionException("Python script not found: " + script.toAbsolutePath());
+            throw new PredictionException("no se encontró el script de Python: " + script.toAbsolutePath());
         }
         List<String> command = new ArrayList<>(List.of(python, script.toString()));
         command.addAll(List.of(arguments));
@@ -68,7 +68,7 @@ public final class PythonRunner {
         try {
             process = builder.start();
         } catch (IOException e) {
-            throw new PredictionException("could not start Python (" + python + "): " + e.getMessage());
+            throw new PredictionException("no se pudo iniciar Python (" + python + "): " + e.getMessage());
         }
 
         // Read both streams while Python runs: if a pipe fills up unread, the process blocks forever.
@@ -77,18 +77,18 @@ public final class PythonRunner {
         try {
             if (!process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
                 process.destroyForcibly();
-                throw new PredictionException("Python did not answer within " + timeout.toSeconds() + " seconds");
+                throw new PredictionException("Python no respondió a tiempo (límite: " + timeout.toSeconds() + " s)");
             }
         } catch (InterruptedException e) {
             process.destroyForcibly();
             Thread.currentThread().interrupt();
-            throw new PredictionException("interrupted while waiting for Python");
+            throw new PredictionException("se interrumpió la espera de Python");
         }
 
         if (process.exitValue() != 0) {
             String message = errors.join().strip();
             throw new PredictionException(
-                    message.isEmpty() ? "Python exited with code " + process.exitValue() : message);
+                    message.isEmpty() ? "Python terminó con el código " + process.exitValue() : message);
         }
         return output.join();
     }

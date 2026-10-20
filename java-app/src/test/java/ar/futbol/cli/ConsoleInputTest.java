@@ -34,7 +34,7 @@ class ConsoleInputTest {
         int value = typing("\nabc\n2.5\n99999999999\n7\n 3 \n").readInt("Pick", 1, 5);
 
         assertEquals(3, value);
-        assertEquals(5, occurrences(output(), "Invalid choice. Type a number from 1 to 5."));
+        assertEquals(5, occurrences(output(), "Opción inválida. Escribí un número del 1 al 5."));
     }
 
     @Test
@@ -66,7 +66,7 @@ class ConsoleInputTest {
 
         assertTrue(output().contains("1. Alpha"));
         assertTrue(output().contains("2. Beta"));
-        assertTrue(output().contains("0. Back"));
+        assertTrue(output().contains("0. Volver"));
     }
 
     @Test

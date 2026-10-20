@@ -64,7 +64,7 @@ class PoissonModel:
         self.window_start = self.window_end - pd.Timedelta(days=self.window_days)
         recent = matches[dates > self.window_start]
         if recent.empty:
-            raise ValueError("no matches to fit the Poisson model")
+            raise ValueError("no hay partidos para ajustar el modelo de Poisson")
         self.window_matches = len(recent)
 
         self.home_avg = recent.home_goals.mean()

@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -38,15 +39,15 @@ public final class Main {
         Path db = args.length > 1 ? Path.of(args[1]) : DEFAULT_DB;
 
         if (!Files.isRegularFile(csv)) {
-            fail("CSV file not found: " + csv.toAbsolutePath()
-                    + System.lineSeparator() + "See data/README.md for the expected format.");
+            fail("No se encontró el archivo CSV: " + csv.toAbsolutePath()
+                    + System.lineSeparator() + "El formato esperado está en data/README.md.");
         }
 
         try {
             CsvMatchReader.Result result = new CsvMatchReader().read(csv);
             printErrors(result.errors());
             if (result.matches().isEmpty()) {
-                fail("No valid matches in " + csv + "; the database was not changed.");
+                fail("No hay partidos válidos en " + csv + "; la base de datos no se modificó.");
             }
 
             MatchRepository repository = new MatchRepository(Database.open(db));
@@ -59,9 +60,9 @@ public final class Main {
             new Menu(repository, predictor, backtester, new ConsoleInput(System.in, System.out), System.out)
                     .run();
         } catch (IOException e) {
-            fail("Could not read data: " + e.getMessage());
+            fail("No se pudieron leer los datos: " + e.getMessage());
         } catch (SQLException e) {
-            fail("Database error: " + e.getMessage());
+            fail("Error de base de datos: " + e.getMessage());
         }
     }
 
@@ -69,18 +70,20 @@ public final class Main {
         if (errors.isEmpty()) {
             return;
         }
-        System.out.println("Skipped " + errors.size() + " invalid row(s):");
+        System.out.println("Filas inválidas que se saltearon (" + errors.size() + "):");
         errors.stream().limit(MAX_ERRORS_SHOWN).forEach(e -> System.out.println("  " + e));
         if (errors.size() > MAX_ERRORS_SHOWN) {
-            System.out.println("  ... and " + (errors.size() - MAX_ERRORS_SHOWN) + " more");
+            System.out.println("  ... y " + (errors.size() - MAX_ERRORS_SHOWN) + " más");
         }
         System.out.println();
     }
 
     private static void printSummary(MatchRepository repository) throws SQLException {
         List<Match> stored = repository.findAll(); // chronological, unlike the CSV
-        System.out.printf("Loaded %d matches of %d teams, %s to %s.%n", stored.size(),
-                repository.findTeams().size(), stored.getFirst().date(), stored.getLast().date());
+        DateTimeFormatter dayMonthYear = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        System.out.printf("Se cargaron %d partidos de %d equipos, del %s al %s.%n", stored.size(),
+                repository.findTeams().size(),
+                stored.getFirst().date().format(dayMonthYear), stored.getLast().date().format(dayMonthYear));
     }
 
     private static void fail(String message) {

@@ -26,7 +26,7 @@ from match_data import HOME_WIN, load_matches, outcome
 from metrics import accuracy, brier_score, log_loss
 
 DEFAULT_FROM = "2023-01-01"
-BASELINE = "Baseline: home always wins"
+BASELINE = "Base: siempre gana el local"  # shown in the (Spanish) app
 
 
 def walk_forward(matches: pd.DataFrame, start: str, k: float = elo.DEFAULT_K,
@@ -40,9 +40,9 @@ def walk_forward(matches: pd.DataFrame, start: str, k: float = elo.DEFAULT_K,
     warm_up = matches[matches.match_date < start]
     evaluated = matches[matches.match_date >= start]
     if evaluated.empty:
-        raise ValueError(f"no matches on or after {start} to evaluate")
+        raise ValueError(f"no hay partidos desde el {start} para evaluar")
     if warm_up.empty:
-        raise ValueError(f"no matches before {start} to warm the models up")
+        raise ValueError(f"no hay partidos antes del {start} para calentar los modelos")
 
     elo_model = elo.Elo(k=k, home_advantage=home_advantage)
     elo_model.fit(warm_up)  # ratings and draw factor learned from the warm-up only

@@ -30,11 +30,11 @@ public final class PythonBacktester implements Backtester {
         try {
             report = PythonRunner.GSON.fromJson(json, BacktestReport.class);
         } catch (JsonParseException e) {
-            throw new PredictionException("could not read the backtest's answer: " + e.getMessage());
+            throw new PredictionException("no se pudo leer la respuesta del backtest: " + e.getMessage());
         }
         if (report == null || report.actual() == null || report.results() == null || report.results().isEmpty()
                 || report.results().stream().anyMatch(score -> score == null || score.model() == null)) {
-            throw new PredictionException("the backtest's answer is missing fields: " + json.strip());
+            throw new PredictionException("a la respuesta del backtest le faltan datos: " + json.strip());
         }
         return report;
     }

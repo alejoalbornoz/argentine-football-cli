@@ -42,11 +42,11 @@ class PythonRunnerTest {
 
     @Test
     void aFailingScriptsMessageOnStderrBecomesTheError() throws Exception {
-        Path script = script("import sys\nprint('unknown team: Nobody', file=sys.stderr)\nsys.exit(1)\n");
+        Path script = script("import sys\nprint('equipo desconocido: Nadie', file=sys.stderr)\nsys.exit(1)\n");
 
         var error = assertThrows(PredictionException.class,
                 () -> new PythonRunner(projectPython()).run(script, TIMEOUT));
-        assertEquals("unknown team: Nobody", error.getMessage());
+        assertEquals("equipo desconocido: Nadie", error.getMessage());
     }
 
     @Test
@@ -55,7 +55,7 @@ class PythonRunnerTest {
 
         var error = assertThrows(PredictionException.class,
                 () -> new PythonRunner(projectPython()).run(script, Duration.ofSeconds(1)));
-        assertEquals("Python did not answer within 1 seconds", error.getMessage());
+        assertEquals("Python no respondió a tiempo (límite: 1 s)", error.getMessage());
     }
 
     @Test
@@ -63,7 +63,7 @@ class PythonRunnerTest {
         var runner = new PythonRunner("python");
 
         var error = assertThrows(PredictionException.class, () -> runner.run(dir.resolve("missing.py"), TIMEOUT));
-        assertTrue(error.getMessage().startsWith("Python script not found"), error.getMessage());
+        assertTrue(error.getMessage().startsWith("no se encontró el script de Python"), error.getMessage());
     }
 
     @Test
@@ -72,7 +72,7 @@ class PythonRunnerTest {
         var runner = new PythonRunner("no-such-python-here");
 
         var error = assertThrows(PredictionException.class, () -> runner.run(script, TIMEOUT));
-        assertTrue(error.getMessage().startsWith("could not start Python (no-such-python-here)"),
+        assertTrue(error.getMessage().startsWith("no se pudo iniciar Python (no-such-python-here)"),
                 error.getMessage());
     }
 }

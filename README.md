@@ -5,14 +5,15 @@ Java handles the menu, data loading and stats; Python scripts handle the predict
 
 ## Menu
 
+The interface is in Spanish (numbers like `1,33`, dates like `20/10/2026`); the code is in English.
 Pick an option by typing its number; `0` goes back (or exits from the main menu).
 
-1. **Standings**: league table for a season (and competition, when a season has more than one)
-2. **Team stats**: home/away split, goals for/against, last 5 results and streaks,
+1. **Tabla de posiciones** (standings): league table for a season (and competition, when a season has more than one)
+2. **Estadísticas de un equipo** (team stats): home/away split, goals for/against, last 5 results and streaks,
    for one season or all of them
-3. **Head-to-head**: record between two teams by venue, and their latest meetings
-4. **Predict a match**: home win / draw / away win probabilities from an Elo or a Poisson model (in Python)
-5. **Evaluate models (backtest)**: log loss, Brier score and accuracy of both models against a baseline
+3. **Historial entre dos equipos** (head-to-head): record between two teams by venue, and their latest meetings
+4. **Predecir un partido** (predict a match): home win / draw / away win probabilities from an Elo or a Poisson model (in Python)
+5. **Evaluar los modelos** (backtest): log loss, Brier score and accuracy of both models against a baseline
 
 ## How predictions work
 

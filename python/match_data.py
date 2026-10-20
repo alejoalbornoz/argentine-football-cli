@@ -21,7 +21,7 @@ def load_matches(db_path: Path) -> pd.DataFrame:
     db_path = Path(db_path)
     if not db_path.is_file():
         # sqlite3.connect would silently create an empty database file instead.
-        raise FileNotFoundError(f"database not found: {db_path}")
+        raise FileNotFoundError(f"no se encontró la base de datos: {db_path}")
     # closing(): "with sqlite3.connect(...)" alone only commits, it does not close the connection.
     with closing(sqlite3.connect(db_path.resolve().as_uri() + "?mode=ro", uri=True)) as connection:
         return pd.read_sql_query(QUERY, connection)

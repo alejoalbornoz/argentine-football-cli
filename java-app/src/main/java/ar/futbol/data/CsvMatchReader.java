@@ -46,7 +46,7 @@ public final class CsvMatchReader {
     public Result read(BufferedReader in) throws IOException {
         String header = in.readLine();
         if (header == null || header.isBlank()) {
-            throw new IOException("the CSV file is empty (expected a header row)");
+            throw new IOException("el archivo CSV está vacío (falta la fila de encabezado)");
         }
         if (header.charAt(0) == BOM) {
             header = header.substring(1); // Excel likes to add a byte-order mark
@@ -69,12 +69,12 @@ public final class CsvMatchReader {
                 Match match = parseRow(line, headerFields.length, columns);
                 String key = match.date() + "|" + match.homeTeam() + "|" + match.awayTeam();
                 if (!seen.add(key)) {
-                    throw new IllegalArgumentException("duplicate match " + match.homeTeam()
-                            + " vs " + match.awayTeam() + " on " + match.date());
+                    throw new IllegalArgumentException("partido repetido: " + match.homeTeam()
+                            + " vs " + match.awayTeam() + " el " + match.date());
                 }
                 matches.add(match);
             } catch (IllegalArgumentException e) {
-                errors.add("line " + lineNumber + ": " + e.getMessage());
+                errors.add("línea " + lineNumber + ": " + e.getMessage());
             }
         }
         return new Result(List.copyOf(matches), List.copyOf(errors));
@@ -87,7 +87,7 @@ public final class CsvMatchReader {
         }
         List<String> missing = REQUIRED_COLUMNS.stream().filter(c -> !columns.containsKey(c)).toList();
         if (!missing.isEmpty()) {
-            throw new IOException("the CSV header is missing column(s): " + String.join(", ", missing));
+            throw new IOException("al encabezado del CSV le faltan columnas: " + String.join(", ", missing));
         }
         return columns;
     }
@@ -96,7 +96,7 @@ public final class CsvMatchReader {
         String[] fields = line.split(",", -1);
         if (fields.length != expectedFields) {
             throw new IllegalArgumentException(
-                    "expected " + expectedFields + " fields but found " + fields.length);
+                    "se esperaban " + expectedFields + " campos pero hay " + fields.length);
         }
         return new Match(
                 field(fields, columns, "season"),
@@ -116,7 +116,7 @@ public final class CsvMatchReader {
         try {
             return LocalDate.parse(value);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("date '" + value + "' is not a valid yyyy-MM-dd date");
+            throw new IllegalArgumentException("la fecha '" + value + "' no tiene el formato yyyy-MM-dd");
         }
     }
 
@@ -124,7 +124,7 @@ public final class CsvMatchReader {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(column + " '" + value + "' is not a whole number");
+            throw new IllegalArgumentException(column + " '" + value + "' no es un número entero");
         }
     }
 }

@@ -19,8 +19,9 @@ import java.util.Optional;
 public final class Menu {
 
     private static final List<String> OPTIONS = List.of(
-            "Standings", "Team stats", "Head-to-head", "Predict a match", "Evaluate models (backtest)");
-    private static final String ALL_SEASONS = "All seasons";
+            "Tabla de posiciones", "Estadísticas de un equipo", "Historial entre dos equipos",
+            "Predecir un partido", "Evaluar los modelos (backtest)");
+    private static final String ALL_SEASONS = "Todas las temporadas";
 
     private record TeamPair(String first, String second) {}
 
@@ -53,34 +54,34 @@ public final class Menu {
                         default -> throw new IllegalStateException("no action for option " + option);
                     }
                 } catch (SQLException e) {
-                    out.println("Database error: " + e.getMessage());
+                    out.println("Error de base de datos: " + e.getMessage());
                 }
             }
         } catch (InputClosedException e) {
             out.println(); // the input ended mid-prompt: finish the line and leave
         }
-        out.println("Bye!");
+        out.println("¡Chau!");
     }
 
     private int askMainOption() {
         out.println();
-        out.println("=== Argentine Football CLI ===");
+        out.println("=== Fútbol argentino: estadísticas y predicciones ===");
         for (int i = 0; i < OPTIONS.size(); i++) {
             out.println((i + 1) + ". " + OPTIONS.get(i));
         }
-        out.println("0. Exit");
-        return input.readInt("Choose an option", 0, OPTIONS.size());
+        out.println("0. Salir");
+        return input.readInt("Elegí una opción", 0, OPTIONS.size());
     }
 
     private void showStandings() throws SQLException {
-        Optional<String> season = input.choose("Season:", repository.findSeasons());
+        Optional<String> season = input.choose("Temporada:", repository.findSeasons());
         if (season.isEmpty()) {
             return;
         }
         List<String> competitions = repository.findCompetitions(season.get());
         Optional<String> competition = competitions.size() == 1
                 ? Optional.of(competitions.getFirst())
-                : input.choose("Competition:", competitions);
+                : input.choose("Competición:", competitions);
         if (competition.isEmpty()) {
             return;
         }
@@ -92,7 +93,7 @@ public final class Menu {
     }
 
     private void showTeamStats() throws SQLException {
-        Optional<String> team = input.choose("Team:", repository.findTeams());
+        Optional<String> team = input.choose("Equipo:", repository.findTeams());
         if (team.isEmpty()) {
             return;
         }
@@ -100,7 +101,7 @@ public final class Menu {
         List<String> scopes = new ArrayList<>();
         scopes.add(ALL_SEASONS);
         scopes.addAll(matches.stream().map(Match::season).distinct().toList()); // chronological
-        Optional<String> scope = input.choose("Season:", scopes);
+        Optional<String> scope = input.choose("Temporada:", scopes);
         if (scope.isEmpty()) {
             return;
         }
@@ -113,7 +114,7 @@ public final class Menu {
     }
 
     private void showHeadToHead() throws SQLException {
-        Optional<TeamPair> teams = chooseTwoTeams("First team:", "Second team:");
+        Optional<TeamPair> teams = chooseTwoTeams("Primer equipo:", "Segundo equipo:");
         if (teams.isEmpty()) {
             return;
         }
@@ -124,32 +125,32 @@ public final class Menu {
     }
 
     private void predictMatch() throws SQLException {
-        Optional<TeamPair> teams = chooseTwoTeams("Home team:", "Away team:");
+        Optional<TeamPair> teams = chooseTwoTeams("Equipo local:", "Equipo visitante:");
         if (teams.isEmpty()) {
             return;
         }
-        Optional<Model> model = input.choose("Model:", List.of(Model.values()), Model::menuText);
+        Optional<Model> model = input.choose("Modelo:", List.of(Model.values()), Model::menuText);
         if (model.isEmpty()) {
             return;
         }
 
         out.println();
-        out.println("Running the " + model.get().label() + " model...");
+        out.println("Calculando con el modelo " + model.get().label() + "...");
         try {
             out.print(Reports.prediction(
                     predictor.predict(model.get(), teams.get().first(), teams.get().second())));
         } catch (PredictionException e) {
-            out.println("Prediction failed: " + e.getMessage());
+            out.println("No se pudo predecir: " + e.getMessage());
         }
     }
 
     private void evaluateModels() {
         out.println();
-        out.println("Running the backtest: replaying past seasons takes about 15 seconds...");
+        out.println("Ejecutando el backtest: repasar las temporadas pasadas tarda unos 15 segundos...");
         try {
             out.print(Reports.backtest(backtester.run()));
         } catch (PredictionException e) {
-            out.println("Backtest failed: " + e.getMessage());
+            out.println("Falló el backtest: " + e.getMessage());
         }
     }
 

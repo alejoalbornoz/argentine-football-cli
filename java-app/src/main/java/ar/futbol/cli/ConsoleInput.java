@@ -42,7 +42,7 @@ public final class ConsoleInput {
             } catch (NumberFormatException e) {
                 // not a number (or too long to be an int): fall through to the hint
             }
-            out.println("Invalid choice. Type a number from " + min + " to " + max + ".");
+            out.println("Opción inválida. Escribí un número del " + min + " al " + max + ".");
         }
     }
 
@@ -56,8 +56,8 @@ public final class ConsoleInput {
         out.println();
         out.println(title);
         printNumbered(options.stream().map(label).toList());
-        out.printf("%" + numberWidth(options) + "d. Back%n", 0);
-        int choice = readInt("Choose", 0, options.size());
+        out.printf("%" + numberWidth(options) + "d. Volver%n", 0);
+        int choice = readInt("Elegí", 0, options.size());
         return choice == 0 ? Optional.empty() : Optional.of(options.get(choice - 1));
     }
 

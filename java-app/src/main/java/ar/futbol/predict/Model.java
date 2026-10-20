@@ -2,8 +2,8 @@ package ar.futbol.predict;
 
 /** The prediction models in {@code python/predict.py}. */
 public enum Model {
-    ELO("elo", "Elo", "team ratings that move after every result"),
-    POISSON("poisson", "Poisson", "expected goals from attack and defence strength");
+    ELO("elo", "Elo", "ratings que se ajustan después de cada resultado"),
+    POISSON("poisson", "Poisson", "goles esperados según ataque y defensa");
 
     private final String id;
     private final String label;
@@ -24,7 +24,7 @@ public enum Model {
         return label;
     }
 
-    /** One line for the menu, e.g. "Elo - team ratings that move after every result". */
+    /** One line for the menu, e.g. "Elo - ratings que se ajustan después de cada resultado". */
     public String menuText() {
         return label + " - " + description;
     }

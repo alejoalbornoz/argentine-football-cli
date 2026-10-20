@@ -3,7 +3,8 @@
 Usage, from the project root:
     python python/predict.py --db data/futbol.db --home "Boca Juniors" --away "River Plate" --model poisson
 
-On failure it prints a one-line message on stderr and exits with code 1.
+On failure it prints a one-line message on stderr and exits with code 1. The texts meant for the
+app's user (details and error messages) are in Spanish, like the rest of the app.
 """
 
 import argparse
@@ -24,14 +25,14 @@ def predict_elo(matches: pd.DataFrame, home: str, away: str, k: float, home_adva
     model = elo.Elo(k=k, home_advantage=home_advantage)
     model.fit(matches)
     return build_result("Elo", home, away, model.predict(home, away), {
-        f"{home} rating": f"{model.rating(home):.0f}",
-        f"{away} rating": f"{model.rating(away):.0f}",
-        f"{home} last match": last_match_date(matches, home),
-        f"{away} last match": last_match_date(matches, away),
-        "Home advantage": f"{home_advantage:g} points",
-        "K factor": f"{k:g}",
-        "Draw factor": f"{model.draw_factor:.3f}",
-        "Matches used": str(len(matches)),
+        f"Rating de {home}": f"{model.rating(home):.0f}",
+        f"Rating de {away}": f"{model.rating(away):.0f}",
+        f"Último partido de {home}": last_match_date(matches, home),
+        f"Último partido de {away}": last_match_date(matches, away),
+        "Ventaja de local": f"{number(home_advantage)} puntos",
+        "Factor K": number(k),
+        "Factor de empate": number(model.draw_factor, 3),
+        "Partidos usados": str(len(matches)),
     })
 
 
@@ -42,13 +43,24 @@ def predict_poisson(matches: pd.DataFrame, home: str, away: str, window_days: in
     matrix = poisson.score_matrix(home_goals, away_goals)
     likeliest = np.unravel_index(matrix.argmax(), matrix.shape)  # (home goals, away goals)
     return build_result("Poisson", home, away, poisson.outcome_probabilities(home_goals, away_goals), {
-        "Expected goals": f"{home} {home_goals:.2f} - {away_goals:.2f} {away}",
-        "Most likely score": f"{likeliest[0]}-{likeliest[1]} ({matrix[likeliest]:.1%})",
-        f"{home} attack / defence": describe_strength(model.strength(home)),
-        f"{away} attack / defence": describe_strength(model.strength(away)),
-        "League goals per match": f"{model.home_avg:.2f} home, {model.away_avg:.2f} away",
-        "Window": f"last {window_days} days to {model.window_end:%Y-%m-%d} ({model.window_matches} matches)",
+        "Goles esperados": f"{home} {number(home_goals, 2)} - {number(away_goals, 2)} {away}",
+        "Resultado más probable": f"{likeliest[0]}-{likeliest[1]} ({number(100 * matrix[likeliest], 1)}%)",
+        f"Ataque / defensa de {home}": describe_strength(model.strength(home)),
+        f"Ataque / defensa de {away}": describe_strength(model.strength(away)),
+        "Goles por partido en la liga":
+            f"{number(model.home_avg, 2)} de local, {number(model.away_avg, 2)} de visitante",
+        "Ventana": (f"últimos {window_days} días hasta el {model.window_end:%d/%m/%Y} "
+                    f"({model.window_matches} partidos)"),
     })
+
+
+def number(value: float, decimals: int | None = None) -> str:
+    """A number the way the (Spanish) app shows it: 1,33 instead of 1.33.
+
+    Without `decimals` it drops useless zeros: 60.0 -> "60", 2.5 -> "2,5".
+    """
+    text = f"{value:g}" if decimals is None else f"{value:.{decimals}f}"
+    return text.replace(".", ",")
 
 
 def build_result(model: str, home: str, away: str, probabilities: tuple[float, float, float],
@@ -67,13 +79,13 @@ def build_result(model: str, home: str, away: str, probabilities: tuple[float, f
 
 def describe_strength(strength: poisson.Strength) -> str:
     if strength.matches == 0:
-        return "1.00 / 1.00 (no matches in the window: assumed average)"
-    return f"{strength.attack:.2f} / {strength.defence:.2f} ({strength.matches} matches)"
+        return "1,00 / 1,00 (sin partidos en la ventana: se lo considera promedio)"
+    return f"{number(strength.attack, 2)} / {number(strength.defence, 2)} ({strength.matches} partidos)"
 
 
 def last_match_date(matches: pd.DataFrame, team: str) -> str:
     played = matches[(matches.home_team == team) | (matches.away_team == team)]
-    return played.match_date.iloc[-1]
+    return f"{pd.Timestamp(played.match_date.iloc[-1]):%d/%m/%Y}"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -94,9 +106,9 @@ def main(argv: list[str] | None = None) -> int:
         teams = set(matches.home_team) | set(matches.away_team)
         for team in (args.home, args.away):
             if team not in teams:
-                raise ValueError(f"unknown team: {team}")
+                raise ValueError(f"equipo desconocido: {team}")
         if args.home == args.away:
-            raise ValueError("home and away must be different teams")
+            raise ValueError("el local y el visitante tienen que ser equipos distintos")
 
         if args.model == "elo":
             result = predict_elo(matches, args.home, args.away, args.k, args.home_advantage)

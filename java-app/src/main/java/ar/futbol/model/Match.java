@@ -25,10 +25,10 @@ public record Match(
         requireText(homeTeam, "home_team");
         requireText(awayTeam, "away_team");
         if (homeGoals < 0 || awayGoals < 0) {
-            throw new IllegalArgumentException("goals cannot be negative");
+            throw new IllegalArgumentException("los goles no pueden ser negativos");
         }
         if (homeTeam.equals(awayTeam)) {
-            throw new IllegalArgumentException("a team cannot play itself (" + homeTeam + ")");
+            throw new IllegalArgumentException("un equipo no puede jugar contra sí mismo (" + homeTeam + ")");
         }
     }
 
@@ -61,13 +61,13 @@ public record Match(
 
     private void requireInvolved(String team) {
         if (!involves(team)) {
-            throw new IllegalArgumentException(team + " did not play " + homeTeam + " vs " + awayTeam);
+            throw new IllegalArgumentException(team + " no jugó " + homeTeam + " vs " + awayTeam);
         }
     }
 
     private static void requireText(String value, String field) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(field + " is empty");
+            throw new IllegalArgumentException(field + " está vacío");
         }
     }
 }

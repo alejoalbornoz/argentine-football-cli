@@ -1,10 +1,10 @@
 package ar.futbol.model;
 
-/** A match result from one team's point of view. */
+/** A match result from one team's point of view. The letters are the Spanish G/E/P shown to the user. */
 public enum Outcome {
-    WIN("W"),
-    DRAW("D"),
-    LOSS("L");
+    WIN("G"),
+    DRAW("E"),
+    LOSS("P");
 
     private final String letter;
 

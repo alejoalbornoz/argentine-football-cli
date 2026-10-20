@@ -55,7 +55,7 @@ class PythonBacktesterTest {
 
         assertEquals(2, report.matches());
         assertEquals(2, report.warmUpMatches());
-        assertEquals(List.of("Elo", "Poisson", "Baseline: home always wins"),
+        assertEquals(List.of("Elo", "Poisson", "Base: siempre gana el local"),
                 report.results().stream().map(BacktestReport.Score::model).toList());
         assertEquals(0.0, report.results().get(2).accuracy(), "neither evaluated match was a home win");
     }
