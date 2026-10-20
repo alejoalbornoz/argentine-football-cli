@@ -1,0 +1,18 @@
+# Java / Maven
+java-app/target/
+
+# Data: downloaded from a third party (not redistributed) and generated from it. See data/README.md
+data/raw/
+data/matches.csv
+data/*.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
